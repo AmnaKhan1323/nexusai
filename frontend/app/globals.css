@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 47% 2%;
+    --foreground: 210 40% 96%;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-surface-950 text-gray-100;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-surface-900;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-gray-700 hover:bg-gray-600;
+  }
+
+  /* Firefox scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #374151 #0f172a;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply border border-gray-800/50 bg-surface-800/30 backdrop-blur-xl;
+  }
+
+  .glass-panel-hover {
+    @apply glass-panel transition-all duration-300 hover:border-gray-700 hover:bg-surface-800/50;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-brand-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent;
+  }
+
+  .gradient-border {
+    @apply border border-transparent bg-clip-padding;
+    background-image: linear-gradient(var(--tw-gradient-stops));
+  }
+
+  .input-base {
+    @apply w-full rounded-xl border border-gray-700 bg-surface-800/50 px-4 py-3 text-gray-100 placeholder-gray-500 transition-all duration-200 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-violet-600 px-6 py-3 font-semibold text-white shadow-lg shadow-brand-500/25 transition-all duration-300 hover:shadow-xl hover:shadow-brand-500/40 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-gray-700 bg-surface-800/50 px-6 py-3 font-semibold text-gray-300 backdrop-blur-sm transition-all duration-300 hover:border-gray-600 hover:bg-surface-700/50 hover:text-white disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .card {
+    @apply overflow-hidden rounded-2xl border border-gray-800 bg-surface-800/50 backdrop-blur-sm transition-all duration-300;
+  }
+
+  .card-hover {
+    @apply card hover:border-gray-700 hover:bg-surface-800/80;
+  }
+}
+
+@layer utilities {
+  .animate-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Typing indicator animation */
+@keyframes typing {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}
+
+.typing-dot {
+  animation: typing 1.4s infinite;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Markdown content styling */
+.prose-nexus {
+  @apply prose prose-invert max-w-none prose-headings:text-gray-100 prose-p:text-gray-300 prose-a:text-brand-400 prose-strong:text-white prose-code:rounded prose-code:bg-surface-700 prose-code:px-1.5 prose-code:py-0.5 prose-code:text-brand-300 prose-pre:bg-surface-800 prose-pre:border prose-pre:border-gray-700 prose-li:text-gray-300 prose-li:marker:text-gray-500;
+}

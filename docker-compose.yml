@@ -1,0 +1,99 @@
+version: "3.9"
+
+# ============================================
+# NexusAI — 100% FREE Infrastructure
+# Ollama (local LLM) + ChromaDB (local vectors)
+# + PostgreSQL + Redis — all free & local
+# ============================================
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: nexusai-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-nexusai}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nexusai_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-nexusai_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nexusai -d nexusai_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: nexusai-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Ollama — FREE local LLM server
+  # Models are pulled on first use (ollama pull llama3)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: nexusai-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nexusai-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: postgresql://nexusai:nexusai_secret@postgres:5432/nexusai_db
+      REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://ollama:11434
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+    volumes:
+      - ./backend:/app
+      - upload_data:/app/uploads
+      - chroma_data:/app/chroma_data
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: nexusai-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./frontend/.env.local
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:8000
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  redis_data:
+  upload_data:
+  ollama_data:
+  chroma_data:
